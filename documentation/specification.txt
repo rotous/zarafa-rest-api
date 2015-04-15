@@ -1,0 +1,122 @@
+Zarafa REST API - Specification (first draft)
+==============================================
+
+Author: Ronald Toussaint (ronald.toussaint@zarafa.com)
+
+Table of contents
+-Chapter 1 - Main goals
+-Chapter 2 - Conditions
+-Chapter 3 - API proposal
+
+
+Chapter 1 - Main goals
+----------------------
+The main goal of this project is to build an RESTful API that can be used by client applications to easily connect to Zarafa server. General principles of a RESTful service will be followed as much as possible. The first version will only have possibilities to request data from the main mail folders. (inbox, sent items, outbox). As versions increment the capabilities of the API will also grow. (save and send mail, read other folders, read public folders, etc) 
+
+
+Chapter 2 - Conditions
+----------------------
+The API will be written in PHP, so the PHPMAPI extension provided by Zarafa can be used. The http server will be Apache2 and redirect rules will be written using mod_rewite. The configuration of the API should make it possible to use CORS if clients should be able to use the API from a different domain. Request bodies and responses will be in JSON.
+
+
+Chapter 3 - API proposal
+------------------------
+
+The following is a proposal for the API. Note that since this is a proposal this document should not be regarded as the API documentation.
+
+MAIN ENTRY POINT:
+method: GET
+url: /zarafa-rest-api/[version]/
+response:
+
+HIERARCHY:
+method: GET
+url: [entry point]/folders/
+response:
+{
+	"_type": "IPF",
+	"success": "true",
+	"size": 3,
+	"folders": [
+		"[entryid]": {
+			"href": "[entry point]/folders/[entryid]",
+			"title": "Inbox"
+		},
+		"[entryid]": {
+			"href": "[entry point]/folders/[entryid]",
+			"title": "Sent items"
+		},
+		"[entryid]": {
+			"href": "[entry point]/folders/[entryid]",
+			"title": "Outbox"
+		}
+	]
+}
+
+FOLDER CONTENTS:
+method: GET
+url: [entry point]/folders/[folder entryid]/
+response:
+{
+	"_type": "IPF",
+	"success": "true",
+	"items": [
+		"[entryid]": {
+			"href": "[entry point]/folders/[folder entryid]/[entryid]",
+			"send_date": "(...)",
+			"received_date": "(...)",
+			"subject": "(...)",
+			"from": {
+				"name": "(...)",
+				"address": "(...)",
+				"type": "(...)"
+			},
+			"to": [{
+				"name": "(...)",
+				"address": "(...)",
+				"type": "(...)"
+			}],
+			"has_attachments": "false"
+		}
+	]
+}
+Possible GET parameters:
+start, limit, orderby, orderdir
+
+MESSAGE CONTENTS:
+method: GET
+url: [entry point]/folders/[folder entryid]/[message entryid]/
+response:
+{
+	"_type": "IPM.NOTE",
+	"success": "true",
+	"entryid": "(...)",
+	"send_date": "(...)",
+	"received_date": "(...)",
+	"subject": "(...)",
+	"body": "(...)",
+	"html_body": "(...)",
+	"is_html": "true",
+	"from": {
+		"name": "(...)",
+		"address": "(...)",
+		"type": "(...)"
+	},
+	"to": [{
+		"name": "(...)",
+		"address": "(...)",
+		"type": "(...)"
+	}],
+	"cc": [{
+		"name": "(...)",
+		"address": "(...)",
+		"type": "(...)"
+	}],
+	"bcc": [{
+		"name": "(...)",
+		"address": "(...)",
+		"type": "(...)"
+	}],
+	"has_attachments": "false"
+}
+

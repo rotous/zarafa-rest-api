@@ -1,0 +1,5 @@
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteBase /zarafa-rest-api
+	RewriteRule ^(.*) index.php?request_url=$1 [L,QSA]
+</IfModule>
