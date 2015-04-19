@@ -5,15 +5,22 @@ abstract class ResourceController
 	public $requestMethod;
 	
 	public function __construct($request) {
-		$this->requestMethod = strtoupper($_SERVER['REQUEST_METHOD']);
+		$this->_setRequestMethod();
 		
-		if ( !$this->_authenticated() ){
+		Authentication::authenticate();
+
+		if ( !Authentication::authenticated() ){
 			// Return unauthorised response
+			Headers::sendStatusUnauthorised();
 			echo "Unauthorised<br>";
 			return;
 		}
 		
 		$this->_run($request);
+	}
+	
+	protected function _setRequestMethod() {
+		$this->requestMethod = strtoupper($_SERVER['REQUEST_METHOD']);
 	}
 	
 	private function _authenticated() {

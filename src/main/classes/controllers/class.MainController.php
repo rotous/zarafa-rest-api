@@ -2,6 +2,8 @@
 
 class MainController {
 	public function __construct(){
+		Session::start();
+		
 		$request_url = trim($_GET['request_url'], '/');
 		unset($_GET['request_url']);
 

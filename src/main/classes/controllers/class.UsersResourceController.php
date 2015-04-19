@@ -1,41 +1,47 @@
 <?php
 
+require_once "3rdparty/phpcrypt/phpCrypt.php";
+use PHP_Crypt\PHP_Crypt as PHP_Crypt;
+
 class UsersResourceController extends ResourceController
 {
+	public function __construct($request) {
+		$this->_setRequestMethod();
+		
+		$this->_run($request);
+	}
 
 	protected function _run($request) {
-		if ( $this->requestMethod == 'POST' ){
+		if ( $this->requestMethod == 'POST' && count($request)==0 ){
 			// User tries to login
-			$this->_login();
-		}elseif ( $this->requestMethod == 'GET' && count($request)>0 ){
-			// User info requested
-			echo "requesting userinfo of user ".$request[0];
-		}else{
-			// Bad request
-			Headers::sendStatusMethodNotAllowed();
-			echo "Method not allowed<br>";
-			print_r($request);
+			Authentication::login($_POST['username'], $_POST['password']);
+			
+			if ( !Authentication::authenticated() ){
+				Headers::sendStatusUnauthorized();
+				return;
+			}else{
+				Headers::sendStatusOk();
+				echo "login succeeded<br>";
+				return;
+			}
+		} else {
+			Authentication::authenticate();
+			
+			if ( !Authentication::authenticated() ){
+				Headers::sendStatusUnauthorized();
+				return;
+			}
+
+		 	if ( $this->requestMethod == 'GET' && count($request)>0 ){
+				// User info requested
+				echo "requesting userinfo of user ".$request[0];
+			}else{
+				// Bad request
+				Headers::sendStatusMethodNotAllowed();
+				echo "Method not allowed<br>";
+				print_r($request);
+			}
 		}
-	}
-	
-	private function _login() {
-		// find username and password from POST
-		$username = $_POST['username'];
-		$password = $_POST['password'];
-		
-		// Login to MAPI to check credentials
-		
-		// Store username and password in session if okay
-		
-		Headers::sendStatusUnauthorized();
-		echo json_encode(array(
-			'error' => array(
-				'code' => 401,
-				'message' => 'Unable to login. User not found.'
-			)
-		), JSON_PRETTY_PRINT);
-		
-		return false;
 	}
 	
 	public function getUrl() {

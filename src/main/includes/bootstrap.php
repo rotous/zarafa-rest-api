@@ -5,9 +5,11 @@
 
 ini_set("display_errors", true);
 error_reporting(E_ALL);
+
+require_once(__DIR__.'/config.php');
  
-//$path = __DIR__ . PATH_SEPARATOR . __DIR__.'/../classes' . PATH_SEPARATOR . __DIR__.'/../mapi';
-//set_include_path(get_include_path() . PATH_SEPARATOR . $path);
+$path = __DIR__.'/..';
+set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 
 $classBaseDir = __DIR__ . '/../classes/';
 $classDirs = array('.');
@@ -45,9 +47,6 @@ function __autoload($className){
 if ( !defined('JSON_PRETTY_PRINT') ){
 	define('JSON_PRETTY_PRINT', 128);
 }
-
-// TODO: move this to a config file or a textfile in which it will be created if it does not exist yet.
-$GLOBALS['applicationkey'] = 'a2#fd&x-g';
 
 // TODO: Remove this if not debugging/developing
 if ( $_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['method']) && strtoupper($_GET['method'])=='POST' ){

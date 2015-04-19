@@ -2,27 +2,46 @@
 
 class Session
 {
-	static private $_instance;
-	private $_sessionName;
-	private $_sessionId; 
+	static private $_started = false;
+	static private $_open = false;
+	static private $_sessionName;
+	static private $_sessionId; 
 	
-	private function __construct() {
-		if ( defined('SESSION_NAME') ){
-			$this->_sessionName = SESSION_NAME;
-		}else{
-			$this->_sessionName = 'ZARAFA_REST_API_SESSION';
+	static public function start() {
+		if ( !Session::$_started) {
+			if ( defined('SESSION_NAME') ){
+				Session::$sessionName = SESSION_NAME;
+			}else{
+				Session::$_sessionName = 'ZARAFA_REST_API_SESSION';
+			}
+			
+			session_name(Session::$_sessionName);
+			Session::open();
+			session_regenerate_id();
+			Session::$_started = true;
+		} else {
+			Session::open();
 		}
-		
-		session_name($this->_sessionName);
-		session_start();
-		session_regenerate_id();
 	}
 	
-	static public function getInstance() {
-		if ( !Session::$_instance ){
-			Session::$_instance = new Session();
+	static public function save($key, $value) {
+		$_SESSION[$key] = $value;
+	}
+	
+	static public function open() {
+		if ( !Session::$_open ){
+			session_start();
+			Session::$_open = true;
 		}
-		
-		return Session::$_instance;
+	}
+	
+	static public function close() {
+		if ( Session::$_open ){
+			session_write_close();
+		}
+	}
+	
+	static public function destroy() {
+		session_destroy();
 	}
 }
